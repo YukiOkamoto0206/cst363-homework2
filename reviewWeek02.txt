@@ -1,0 +1,14 @@
+Week 02
+Programmer: <your name>
+Partner: <name>
+How much time did your spend reviewing your partern's code:  <nn minutes> 
+
+The following is repeated for each item brought up at the review.
+
+Item Description: <describe the issue> 
+Classification:   code Error | suggestion | comments 
+Resolution:  YES | NO | if NO, why not?
+
+Item Description: <describe the issue> 
+Classification:   code Error | suggestion | comments 
+Resolution:  YES | NO | if NO, why not?
