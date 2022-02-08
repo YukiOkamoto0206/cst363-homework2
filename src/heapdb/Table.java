@@ -96,10 +96,12 @@ public class Table implements ITable {
 			throw new IllegalStateException("Error: table does not have a primary key.  Can not lookup by key.");
 		}
 
-		// TODO implement this method
-		
-		throw new  UnsupportedOperationException();
-
+		for (Tuple tuple: tuples) {
+			if (tuple.getKey().equals(key)) {
+				return tuple;
+			}
+		}
+		return null;
 	}
 
 	@Override
