@@ -116,35 +116,10 @@ public class Table implements ITable {
         if (schema.getColumnIndex(colname) < 0) {
             throw new IllegalStateException("Error: table does not contain column " + colname);
         }
-        // TODO implement this method
         ITable t = new Table(schema);
-        for (int i = 0; i < tuples.size(); i++) {
-            if (tuples.get(i).getSchema().getName(i).equals(colname)) {
-                Tuple tuple = tuples.get(i);
-                switch (colname) {
-                    case "ID":
-                        if (tuple.get(0).equals(value)) {
-                            t.insert(tuple);
-                        }
-                        break;
-                    case "name":
-                        if (tuple.get(1).equals(value)) {
-                            t.insert(tuple);
-                        }
-                        break;
-                    case "dept_name":
-                        if (tuple.get(2).equals(value)) {
-                            t.insert(tuple);
-                        }
-                        break;
-                    case "salary":
-                        if (tuple.get(3).equals(value)) {
-                            t.insert(tuple);
-                        }
-                        break;
-                    default:
-                        break;
-                }
+        for (Tuple tuple: tuples) {
+            if (tuple.get(colname).equals(value)) {
+                t.insert(tuple);
                 return t;
             }
         }
