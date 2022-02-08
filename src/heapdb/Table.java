@@ -100,8 +100,6 @@ public class Table implements ITable {
 
     @Override
     public String toString() {
-
-        // TODO implement this method
         if (tuples.isEmpty()) {
             return "Empty Table";
         } else {
