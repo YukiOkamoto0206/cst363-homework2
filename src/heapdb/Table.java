@@ -14,44 +14,6 @@ public class Table implements ITable {
         tuples = new ArrayList<>();
     }
 
-    public static void main(String[] args) {
-        Schema schema = new Schema();
-        schema.addKeyIntType("ID");   // primary key ID int
-        schema.addVarCharType("name");
-        schema.addVarCharType("dept_name");
-        schema.addIntType("salary");
-        Tuple[] tuples = new Tuple[]{
-                new Tuple(schema, 22222, "Einstein", "Physics", 95000),
-                new Tuple(schema, 12121, "Wu", "Finance", 90000),
-                new Tuple(schema, 32343, "El Said", "History", 60000),
-                new Tuple(schema, 45565, "Katz", "Comp. Sci.", 75000),
-                new Tuple(schema, 98345, "Kim", "Elec. Eng.", 80000),
-                new Tuple(schema, 10101, "Srinivasan", "Comp. Sci.", 65000),
-                new Tuple(schema, 76766, "Crick", "Biology", 72000),
-        };
-        Table table = new Table(schema);
-        for (int i = 0; i < tuples.length; i++) {
-            table.insert(tuples[i]);
-        }
-        System.out.println(table.toString());
-
-        Tuple oldTup = new Tuple(schema, 22222, "Einstein", "Physics", 95000);
-        table.insert(oldTup);
-        System.out.println(table.toString());
-//		Tuple newTup = new Tuple(schema, 11111, "Molina",      "Music",   70000 );
-        int ID = oldTup.getInt(0);
-        System.out.println(ID);
-
-//		System.out.println(tuples[0].getSchema().getName(0));
-        System.out.println(table.lookup("ID", 12121));
-//		System.out.println(table.lookup(11111));
-
-//		ITable t = new Table(schema);
-//		t.insert
-//		System.out.print(t);
-
-    }
-
     @Override
     public Schema getSchema() {
         return schema;
@@ -90,9 +52,11 @@ public class Table implements ITable {
         for (Tuple tuple : tuples) {
             if (tuple.getKey().equals(key)) {
                 tuples.remove(tuple);
+                System.out.println("delete " + tuple.get(0) + ":true");
                 return true;
             }
         }
+        System.out.println("delete " + key + ":false");
         return false;
     }
 
@@ -105,7 +69,7 @@ public class Table implements ITable {
 
         for (Tuple tuple : tuples) {
             if (tuple.getKey().equals(key)) {
-                return tuple;
+                System.out.println(tuple);
             }
         }
         return null;
@@ -117,11 +81,14 @@ public class Table implements ITable {
             throw new IllegalStateException("Error: table does not contain column " + colname);
         }
         ITable t = new Table(schema);
-        for (Tuple tuple: tuples) {
+        for (Tuple tuple : tuples) {
             if (tuple.get(colname).equals(value)) {
                 t.insert(tuple);
-                return t;
+                System.out.println(tuple);
             }
+        }
+        if (t.size() == 0) {
+            System.out.println("Empty Table");
         }
         return t;
     }
