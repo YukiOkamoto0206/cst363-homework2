@@ -13,6 +13,37 @@ public class Table implements ITable {
 		this.schema = schema;
 		tuples = new ArrayList<>();
 	}
+
+	public static void main(String[] args) {
+		Schema schema = new Schema();
+		schema.addKeyIntType("ID");   // primary key ID int
+		schema.addVarCharType("name");
+		schema.addVarCharType("dept_name");
+		schema.addIntType("salary");
+		Tuple[] tuples = new Tuple[] {
+				new Tuple(schema, 22222, "Einstein",    "Physics", 95000),
+				new Tuple(schema, 12121, "Wu",          "Finance", 90000),
+				new Tuple(schema, 32343, "El Said" ,    "History", 60000),
+				new Tuple(schema, 45565, "Katz",        "Comp. Sci.", 75000),
+				new Tuple(schema, 98345, "Kim",         "Elec. Eng.", 80000),
+				new Tuple(schema, 10101, "Srinivasan" , "Comp. Sci.", 65000),
+				new Tuple(schema, 76766, "Crick" ,      "Biology", 72000),
+		};
+		Table table = new Table(schema);
+		for (int i = 0; i < tuples.length; i++) {
+			table.insert(tuples[i]);
+		}
+		System.out.println(table.toString());
+
+		Tuple oldTup = new Tuple(schema, 22222, "Einstein",    "Physics", 95000 );
+		table.insert(oldTup);
+		System.out.println(table.toString());
+//		Tuple newTup = new Tuple(schema, 11111, "Molina",      "Music",   70000 );
+
+		System.out.println(table.lookup(22222));
+		System.out.println(table.lookup(11111));
+
+	}
 	
 	@Override
 	public Schema getSchema() {
@@ -35,11 +66,13 @@ public class Table implements ITable {
 		if (! rec.getSchema().equals(schema)) {
 			throw new IllegalStateException("Error: tuple schema does not match table schema.");
 		}
-		
-		// TODO  check for duplicate key. If no duplicate, then add to table list.
-		
-		throw new  UnsupportedOperationException();
-		
+		for (Tuple tuple: tuples) {
+			if (tuple.getKey().equals(rec.getKey())) {
+				return false;
+			}
+		}
+		tuples.add(rec);
+		return true;
 	}
 
 	@Override
@@ -47,10 +80,13 @@ public class Table implements ITable {
 		if (schema.getKey() == null) {
 			throw new IllegalStateException("Error: table does not have a primary key.  Can not delete.");
 		}
-		
-		// TODO implement this method
-		
-		throw new  UnsupportedOperationException();
+		for (Tuple tuple: tuples) {
+			if (tuple.getKey().equals(key)) {
+				tuples.remove(tuple);
+				return true;
+			}
+		}
+		return false;
 	}
 
 
@@ -87,8 +123,16 @@ public class Table implements ITable {
 	public String toString() {
 		
 		// TODO implement this method
-		
-		throw new  UnsupportedOperationException();
+		if (tuples.isEmpty()) {
+			return "Empty Table";
+		} else {
+			StringBuilder sb = new StringBuilder();
+			for (Tuple t : this) {
+				sb.append(t.toString());
+				sb.append("\n");
+			}
+			return sb.toString();
+		}
 	}
 	
 	/*
