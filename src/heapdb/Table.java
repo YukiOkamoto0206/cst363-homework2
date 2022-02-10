@@ -76,10 +76,12 @@ public class Table implements ITable {
     }
 
     @Override
+    // using inheritence (
     public ITable lookup(String colname, Object value) {
         if (schema.getColumnIndex(colname) < 0) {
             throw new IllegalStateException("Error: table does not contain column " + colname);
         }
+        // parant class  child class
         ITable t = new Table(schema);
         for (Tuple tuple : tuples) {
             if (tuple.get(colname).equals(value)) {
@@ -100,16 +102,22 @@ public class Table implements ITable {
 
     @Override
     public String toString() {
-        if (tuples.isEmpty()) {
-            return "Empty Table";
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (Tuple t : this) {
-                sb.append(t.toString());
-                sb.append("\n");
-            }
-            return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        for (Tuple t: tuples) {
+            sb.append(t.toString());
+            sb.append("\n");
         }
+        return sb.toString();
+//        if (tuples.isEmpty()) {
+//            return "Empty Table";
+//        } else {
+//            StringBuilder sb = new StringBuilder();
+//            for (Tuple t : this) {
+//                sb.append(t.toString());
+//                sb.append("\n");
+//            }
+//            return sb.toString();
+//        }
     }
 
     /*
