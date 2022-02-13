@@ -20,20 +20,23 @@ public class EqCondition extends Condition {
 	}
 	
 	public String getColumnName() {
-		// TODO replace with your code.
-		throw new  UnsupportedOperationException();
+		return colName;
 	}
 	
 	public Object getValue() {
-		// TODO replace with your code.
-		throw new  UnsupportedOperationException();
+		return value;
 	}
 	
 	
 	@Override
 	public Boolean eval(Tuple tuple) {
 		// TODO replace with your code.
-		throw new  UnsupportedOperationException();
+		for (int i = 0; i < tuple.getSchema().size(); i++) {
+			if (value.equals(tuple.get(i))) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@Override
