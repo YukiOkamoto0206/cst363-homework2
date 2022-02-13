@@ -21,7 +21,15 @@ public class OrCondition extends Condition {
 	@Override
 	public Boolean eval(Tuple tuple) {
 		// TODO replace with your code.
-		throw new  UnsupportedOperationException();
+		if(cond1.eval(tuple) == null) {
+			throw new  UnsupportedOperationException();
+		}else if(cond2.eval(tuple) == null) {
+			throw new  UnsupportedOperationException();
+		}
+		if( ( cond1.eval(tuple) || cond2.eval(tuple) ) ) { // check to see if the conditions are true in the table?
+			return true;
+		}
+		return false;
 	}
 	
 	@Override
