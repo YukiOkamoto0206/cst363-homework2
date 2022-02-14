@@ -1,0 +1,14 @@
+Week 03
+Programmer: Yuki Okamoto
+Partner: Matthew Fernandez
+How much time did your spend reviewing your partner's code:  20min
+
+The following is repeated for each item brought up at the review.
+
+Item Description: SelectQuery.java: line68 -> if(cond.eval(t)) is better than to write "== true"
+Classification:   suggestion
+Resolution:   NO because it works.
+
+Item Description: In the delete method, you can use for each loop instead of using for loop
+Classification:   suggestion
+Resolution:   NO because it works.
