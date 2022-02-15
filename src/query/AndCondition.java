@@ -21,7 +21,6 @@ public class AndCondition extends Condition {
 	
 	@Override
 	public Boolean eval(Tuple tuple) {
-		// TODO replace with your code.
 		if(cond1.eval(tuple) == null) {
 			return null;
 		}else if(cond2.eval(tuple) == null) {
