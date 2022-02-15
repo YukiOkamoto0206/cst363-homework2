@@ -35,9 +35,12 @@ public class Table implements ITable {
         if (!rec.getSchema().equals(schema)) {
             throw new IllegalStateException("Error: tuple schema does not match table schema.");
         }
-        for (Tuple tuple : tuples) {
-            if (tuple.getKey().equals(rec.getKey())) {
-                return false;
+        // Added if statement to delete error of last test case
+        if (schema.getKey()!=null) {
+            for (Tuple tuple : tuples) {
+                if (tuple.getKey().equals(rec.getKey())) {
+                    return false;
+                }
             }
         }
         tuples.add(rec);
