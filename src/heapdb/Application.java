@@ -1,5 +1,7 @@
 package heapdb;
 
+import query.*;
+
 public class Application {
     public static void main(String[] args) {
         Schema schema = new Schema();
@@ -45,5 +47,22 @@ public class Application {
         System.out.println("lookup ID=19802: ");
         table.lookup("ID", 19802);
 
+        // eval1
+        Condition cond = new EqCondition("dept_name", "Comp. Sci.");
+        SelectQuery q = new SelectQuery(cond);
+        ITable result = q.eval(table);
+        System.out.println(result);
+
+        // eval2
+        cond = new AndCondition(new EqCondition("salary", 70000), new EqCondition("name", "Bruns"));
+        q = new SelectQuery(cond);
+        result = q.eval(table);
+        System.out.println(result);
+
+        // eval3
+        cond = new OrCondition(new AndCondition(new EqCondition("salary", 70000), new EqCondition("name", "Bruns")), new AndCondition(new EqCondition("name", "Scott"), new EqCondition("dept_name", "Math")));
+        q = new SelectQuery(cond);
+        result = q.eval(table);
+        System.out.println(result);
     }
 }
