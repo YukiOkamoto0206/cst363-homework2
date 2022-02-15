@@ -47,29 +47,28 @@ public class SelectQuery  {
 	
 	public ITable eval(ITable table) {
 		// TODO replace with your code.
-		// 1. create a result Schema if colNames is not null. Use Schema.project method.
+		Schema schema;
 		if (colNames != null) {
-//			Schema schema = new Schema();
-//			schema.project(colNames);
-			table.getSchema().project(colNames);
-		}
-		// 2. create a result Table.
-		ITable result_table = new Table(table.getSchema());
-		// 3. Iterate over all tuple in table given as argument.
-//		for (int i = 0; i< result_table.size(); i++) {
-//			result_table.
-//		}
-		// 4.		for each row,  cond.eval(tuple)
-		// 5. 		if false skip to next row.
-		// 6.			if ture --> project columns from tuple, using Tuple.project ethod
-		// 				insert into result table
-		// 7. return result table.
-		for (Tuple tuple : table) {
-			if (cond.eval(tuple)) {
-				result_table.insert(tuple);
+			schema=table.getSchema().project(colNames);
+			ITable result_table = new Table(schema);
+			for (Tuple tuple : table) {
+				if (cond.eval(tuple)) {
+					// Need to add project(schema) for passing the last test case
+					result_table.insert(tuple.project(schema));
+				}
 			}
+			return result_table;
+		} else {
+			schema=table.getSchema();
+			ITable result_table = new Table(schema);
+			for (Tuple tuple : table) {
+				if (cond.eval(tuple)) {
+					// if you implemented insert(tuple.project(schema)), you will get error at first two test cases
+					result_table.insert(tuple);
+				}
+			}
+			return result_table;
 		}
-		return result_table;
 	}
 
 	@Override
