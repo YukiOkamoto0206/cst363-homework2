@@ -23,9 +23,9 @@ public class AndCondition extends Condition {
 	public Boolean eval(Tuple tuple) {
 		// TODO replace with your code.
 		if(cond1.eval(tuple) == null) {
-			throw new  UnsupportedOperationException();
+			return null;
 		}else if(cond2.eval(tuple) == null) {
-			throw new  UnsupportedOperationException();
+			return null;
 		}
 		if( ( cond1.eval(tuple) && cond2.eval(tuple) ) ) { // check to see if the conditions are true in the table?
 			return true;
