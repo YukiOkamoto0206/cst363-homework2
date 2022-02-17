@@ -30,14 +30,7 @@ public class EqCondition extends Condition {
 	
 	@Override
 	public Boolean eval(Tuple tuple) {
-		// my code does not work
-//		for (int i = 0; i < tuple.getSchema().size(); i++) {
-//			if (value.equals(tuple.get(i))) {
-//				return true;
-//			}
-//		}
-		if (tuple.get(colName).equals(value)) return true;
-		return false;
+		return (tuple.get(colName).equals(value));
 	}
 	
 	@Override
