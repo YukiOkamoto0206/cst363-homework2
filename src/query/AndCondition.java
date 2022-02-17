@@ -20,14 +20,6 @@ public class AndCondition extends Condition {
 
     @Override
     public Boolean eval(Tuple tuple) {
-//		if(cond1.eval(tuple) == null) {
-//			return null;
-//		}else if(cond2.eval(tuple) == null) {
-//			return null;
-//		}
-//		if( ( cond1.eval(tuple) && cond2.eval(tuple) ) ) { // check to see if the conditions are true in the table?
-//			return true;
-//		}
         return cond1.eval(tuple) && cond2.eval(tuple);
     }
 
