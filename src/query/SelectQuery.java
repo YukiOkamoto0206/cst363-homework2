@@ -9,16 +9,16 @@ import heapdb.Tuple;
 /**
  * A simple select query of the form:
  * select column, column, . . . from table where condition
- * 
+ *
  * @author Glenn
  *
  */
 
 public class SelectQuery  {
-	
+
 	private Condition cond;
 	private String[] colNames;	   // a value of null means return all columns of the table
-	
+
 	/**
 	 * A query that contains both a where condition and a projection of columns
 	 * @param colNames are the columns to return
@@ -28,23 +28,37 @@ public class SelectQuery  {
 		this.colNames = colNames;
 		this.cond = cond;
 	}
-	
+
 	/**
-	 * A query that contains both a where condition.  All columns 
+	 * A query that contains both a where condition.  All columns
 	 * of the Tuples are returned.
 	 * @param cond is the where clause
 	 */
 	public SelectQuery(Condition cond) {
 		this(null, cond);
 	}
-	
-	
+
+
 	public static Table naturalJoin(ITable table1, ITable table2) {
 		// TODO replace with your code.
 		// Hint: use the Schema naturalJoin method.
-		throw new  UnsupportedOperationException();
+		Schema resultSchema = table1.getSchema().naturaljoin(table2.getSchema());Table result = new Table(resultSchema);
+        // nested loop join
+        for (Tuple t1 : table1) {
+            for (Tuple t2 : table2) {
+                // evaluate join predicates
+                // compare columns from t1 with same column name from t2
+                // determine that list of columns from
+                //  that are in both table1, table2
+                Tuple r = Tuple.joinTuple(resultSchema, t1, t2);
+                result.insert(r);
+            }
+        }
+		return result;
+		// とりあえず比較してやればおけい。
+//		throw new  UnsupportedOperationException();
 	}
-	
+
 	public ITable eval(ITable table) {
 		// TODO replace with your code.
 		Schema schema;
