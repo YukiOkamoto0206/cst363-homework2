@@ -43,7 +43,6 @@ public class SelectQuery {
 
 
     public static Table naturalJoin(ITable table1, ITable table2) {
-        // Hint: use the Schema naturalJoin method.
         Schema resultSchema = table1.getSchema().naturaljoin(table2.getSchema());
         Table result = new Table(resultSchema);
 
@@ -65,10 +64,6 @@ public class SelectQuery {
         // nested loop join
         for (Tuple t1 : table1) {
             for (Tuple t2 : table2) {
-                // evaluate join predicates
-                // compare columns from t1 with same column name from t2
-                // determine that list of columns from
-                //  that are in both table1, table2
 
                 boolean isAdd = true;
 
