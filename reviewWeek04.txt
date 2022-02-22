@@ -1,0 +1,14 @@
+Week 04
+Programmer: Yuki Okamoto
+Partner: Matthew Fernandez
+How much time did your spend reviewing your partner's code:  30min
+
+The following is repeated for each item brought up at the review.
+
+Item Description: SelectQuery.java: line79 -> if(match) is better than to match "== true"
+Classification:   suggestion
+Resolution:   NO because it works.
+
+Item Description: Change the name match to isMatch. It makes easier to find this is flag
+Classification:   suggestion
+Resolution:   NO because it works.
