@@ -43,7 +43,6 @@ public class SelectQuery {
 
 
     public static Table naturalJoin(ITable table1, ITable table2) {
-        // TODO replace with your code.
         // Hint: use the Schema naturalJoin method.
         Schema resultSchema = table1.getSchema().naturaljoin(table2.getSchema());
         Table result = new Table(resultSchema);
@@ -52,11 +51,13 @@ public class SelectQuery {
         Schema schema2 = table2.getSchema();
 
         // duplicate method
-        ArrayList<String> arr = new ArrayList<String>();
+        ArrayList<String> schemaList = new ArrayList<>();
         for (int i = 0; i < schema1.size(); i++) {
             for (int j = 0; j < schema2.size(); j++) {
                 if (schema1.getName(i).equals(schema2.getName(j))) {
-                    arr.add(schema1.getName(i)); // list of duplicated cols
+                    if (!schemaList.contains(table1.getSchema().getName(i))) {
+                        schemaList.add(schema1.getName(i)); // list of duplicated cols
+                    }
                 }
             }
         }
@@ -68,14 +69,25 @@ public class SelectQuery {
                 // compare columns from t1 with same column name from t2
                 // determine that list of columns from
                 //  that are in both table1, table2
-                if (t1.getSchema().equals(t2.getSchema())) {
+
+                boolean isAdd = true;
+
+                // schemaList.size() -> 2
+                for (int i = 0; i < schemaList.size(); i++) {
+                    // schemaList.get(i) -> B or D
+                    if (!(t1.get(schemaList.get(i)).equals(t2.get(schemaList.get(i))))) {
+                        // if it happens once, no add
+                        isAdd = false;
+                        break;
+                    }
+                }
+                if (isAdd) {
                     Tuple r = Tuple.joinTuple(resultSchema, t1, t2);
                     result.insert(r);
                 }
             }
         }
         return result;
-        // とりあえず比較してやればおけい。
     }
 
     public ITable eval(ITable table) {
