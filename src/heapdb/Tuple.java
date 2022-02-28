@@ -1,33 +1,31 @@
 package heapdb;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import static heapdb.Constants.INT_TYPE;
 import static heapdb.Constants.VARCHAR_TYPE;
 
 public class Tuple {
-	
 	protected Object[] values;
 	protected Schema schema;    
+	
 	
 	/**
 	 * Create a tuple given a schema and column values.
 	 * @param schema
 	 * @param values
 	 */
+	
 	public Tuple(Schema schema, Object ...values) {
+		this.values = values;
+		this.schema = schema;
 		if (values.length != schema.size()) {
 			throw new IllegalArgumentException("Error: Number of values does not match size of schema.");
 		}
-		this.schema = schema;
-		this.values = new Object[schema.size()];
-		for (int k=0; k<schema.size(); k++) {
-			this.values[k] = values[k];
-		}
-		
 	}
 	
 	/**
-	 * Create a tuple with null values for all columns.
+	 * Create a tuple with 0 for integer columns and null for varchar columns.
 	 * @param schema
 	 */
 	public Tuple(Schema schema) {
@@ -46,12 +44,6 @@ public class Tuple {
 		}
 	}
 	
-	/**
-	 * Compare tuple keys which can be Integer or String values.
-	 * return negative number if a < b
-	 *        0  if a == b
-	 *        positive number if a > b
-	 */
 	public static int compareKeys(Object a, Object b) {
 		if (a instanceof Integer && b instanceof Integer) {
 			int i1 = (Integer)a;
@@ -66,10 +58,6 @@ public class Tuple {
 		}
 	}
 	
-	/**
-	 * Based on the schema for the joined table
-	 * return a join of the given tuples
-	 */
 	public static Tuple joinTuple(Schema s, Tuple t1, Tuple t2) {
 		Tuple r = new Tuple(s);
 		int t1size = t1.getSchema().size();
@@ -92,8 +80,7 @@ public class Tuple {
 	
 	/**
 	 * number of bytes in serialized tuple
-	 * each integer type is 4 bytes
-	 * each string type is 4 + string length
+	 * each int type is 4 bytes, each string type is 4 + string length
 	 */
 	public int length() {
 		int len=0;
@@ -108,7 +95,8 @@ public class Tuple {
 	}
 	
 	/**
-	 * Return the value of the ith column  i=0, 1, . . .   
+	 * Return the value of the ith column    
+	 * @param column index
 	 */
 	public Object get(int i) {	
 		if (i < 0 || i > schema.size()) {
@@ -119,6 +107,7 @@ public class Tuple {
 	
 	/**
 	 * Return the integer value of the ith column    
+	 * @param column index
 	 */
 	public int getInt(int i) {	
 		if (i < 0 || i > schema.size()) {
@@ -133,6 +122,7 @@ public class Tuple {
 	
 	/**
 	 * Return the String value of the ith column    
+	 * @param column index
 	 */
 	public String getString(int i) {	
 		if (i < 0 || i > schema.size()) {
@@ -147,6 +137,7 @@ public class Tuple {
 	
 	/**
 	 * Return the value of column by column name 
+	 * @param column name
 	 */
 	public Object get(String name) {
 		int i = schema.getColumnIndex(name);
@@ -158,6 +149,8 @@ public class Tuple {
 	
 	/**
 	 * Set the value of the ith column 
+	 * @param column index
+	 * @param value
 	 */
 	public void set(int i, Object value) {
 		if (i < 0 || i >= schema.size()) {
@@ -175,7 +168,8 @@ public class Tuple {
 	}
 	
 	/** 
-	 * Return subset of column values based on column names in schema.
+	 * Return subset of column values.
+	 * @param schema containing the columns to project.
 	 */
 	public Tuple project(Schema schema) {
 		Object[] values = new Object[schema.size()];
@@ -186,9 +180,6 @@ public class Tuple {
 		return result;
 	}
 	
-	/**
-	 * read the buffer and return a Tuple.
-	 */
 	public static Tuple deserialize(Schema schema, ByteBuffer byte_buffer) {
 		Tuple t = new Tuple(schema);
 		for (int icol=0; icol < schema.size(); icol++) {
@@ -209,9 +200,6 @@ public class Tuple {
 		return t;
 	}
 	
-	/**
-	 * write this tuple to the buffer.
-	 */
 	public void serialize(ByteBuffer byte_buffer) {
 		for (int icol=0; icol<schema.size(); icol++) {
 			switch (schema.getType(icol)) {
@@ -229,20 +217,14 @@ public class Tuple {
 		}
 	}
 	
-	/**
-	 * return the serialized length of the give key 
-	 * For an integer value, the length is 4 bytes
-	 * For a string value, the length is 4 + string length
-	 */
 	public static int keyLength(Object key) {
 		if (key instanceof Integer) return 4;
 		else if (key instanceof String) return 4 + ((String)key).length();
 		else throw new RuntimeException("Key type is invalid. " + key.getClass() + " " + key);
 	}
 	
-	/**
-	 * return a byte array from a given key value 
-	 * key must be an Integer or String value
+	/*
+	 * convert tuple key to binary byte[]
 	 */
 	public static byte[] serializeKey(Object key) {
 		byte[] bytes;
@@ -259,10 +241,7 @@ public class Tuple {
 		
 		return bytes;
 	}
-	
-	/**
-	 * Return a printable string from this tuple
-	 */
+		
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder("[");
@@ -272,5 +251,24 @@ public class Tuple {
 		}
 		s.append("]");
 		return s.toString();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Tuple other = (Tuple) obj;
+		if (schema == null) {
+			if (other.schema != null)
+				return false;
+		} else if (!schema.equals(other.schema))
+			return false;
+		if (!Arrays.deepEquals(values, other.values))
+			return false;
+		return true;
 	}
 }
