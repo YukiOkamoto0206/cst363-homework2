@@ -1,0 +1,10 @@
+Week 05
+Programmer: Yuki Okamoto
+Partner: Matthew Fernandez
+How much time did your spend reviewing your partner's code:  30min
+
+The following is repeated for each item brought up at the review.
+
+Item Description: I think you can delete unimportant comments
+Classification:   suggestion
+Resolution:   NO because it works.
