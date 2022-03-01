@@ -38,7 +38,6 @@ public class LSMmemory implements ITable {
 
     @Override
     public boolean insert(Tuple rec) {
-        // TODO
         // DO not check for duplicate key.
         // Allow a duplicate key to replace current entry in the TreeMap.
         // use Tuple copy constructor to make a copy of rec.  put copy into TreeMap.
@@ -46,14 +45,13 @@ public class LSMmemory implements ITable {
         // Why a copy?
         // 	prevent user from modifying tuple after it has
         //   been added into the tree and constraints (if any) have been checked.
-        level0.put(t.getKey(), rec); // up-sert update+insert
+        level0.put(t.getKey(), t); // up-sert update+insert
         return true;
 
     }
 
     @Override
     public boolean delete(Object key) {
-        // TODO remove an entry.  If the key does not exist, do nothing.
         Tuple t = level0.remove(key);
         // if t == null, them key did not exist.
         // t contains the removed tuple
@@ -62,19 +60,29 @@ public class LSMmemory implements ITable {
 
     @Override
     public Tuple lookup(Object key) {
-        // TODO implement this method and delete the following throw statement.
-        throw new UnsupportedOperationException("LSMmemory lookup(key) not implemented.");
+        if (level0.get(key) != null) {
+            return level0.get(key);
+        }
+        return null;
     }
 
     @Override
     public ITable lookup(String colname, Object value) {
-        throw new UnsupportedOperationException("LSMmemory lookup(colname, value) not supported.");
+        return null;
     }
 
     @Override
     public String toString() {
-        //TODO implement this method. Return a string that contains all tuples separated by new line "\n" character.
-        throw new UnsupportedOperationException("LSMmemory toString not implemented.");
+        if (schema.size() ==0) {
+            return "Empty Table";
+        }else {
+            StringBuilder sb = new StringBuilder();
+            for (Tuple t : this) {
+                sb.append(t.toString());
+                sb.append("\n");
+            }
+            return sb.toString();
+        }
     }
 
     @Override

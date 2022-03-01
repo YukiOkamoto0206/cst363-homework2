@@ -19,7 +19,7 @@ public class Application {
                 new Tuple(instSchema, 10101, "Srinivasan" , "Comp. Sci.", 65000),
                 new Tuple(instSchema, 76766, "Crick" ,      "Biology", 72000),
         };
-        Table instTable = new Table(instSchema);
+        LSMmemory instTable = new LSMmemory("inst", instSchema);
         for (int i = 0; i < tuples.length; i++) {
             instTable.insert(tuples[i]);
         }
@@ -30,7 +30,7 @@ public class Application {
         deptSchema.addVarCharType("building");
         deptSchema.addIntType("budget");
 
-        Table deptTable = new Table(deptSchema);
+        LSMmemory deptTable = new LSMmemory("dept", deptSchema);
         Tuple[] deptTuples = new Tuple[] {
                 new Tuple(deptSchema, "Biology",     "Watson",  90000),
                 new Tuple(deptSchema, "Comp. Sci.",  "Taylor", 100000),
