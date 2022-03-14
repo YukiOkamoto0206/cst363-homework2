@@ -44,6 +44,10 @@ public class Tuple {
 		}
 	}
 	
+	/**
+	 * Compare keys
+	 * @return 0 if a equals b, >0 if a is greater than b, <0 if b is greater than a
+	 */
 	public static int compareKeys(Object a, Object b) {
 		if (a instanceof Integer && b instanceof Integer) {
 			int i1 = (Integer)a;
