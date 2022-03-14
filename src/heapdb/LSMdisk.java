@@ -56,11 +56,12 @@ public class LSMdisk implements Iterable<Tuple> {
      */
 
     public Tuple lookup(Object key) {
-        // TODO
-        /*
-         * use LSMiterator to read all tuples in file and search for key.
-         */
-        throw new UnsupportedOperationException("LSMdisk lookup not implemented.");
+        for (Tuple tuple : this) {
+            if (tuple.getKey().equals(key)) {
+                return tuple;
+            }
+        }
+        return null;
     }
 
     /**
