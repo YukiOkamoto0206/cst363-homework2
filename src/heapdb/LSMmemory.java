@@ -9,6 +9,7 @@ public class LSMmemory implements ITable {
 
     private Schema schema;
     private TreeMap<Object, Tuple> level0;
+    private LSMdisk level1;
 
     /**
      * create a new LSM table
@@ -16,14 +17,17 @@ public class LSMmemory implements ITable {
     public LSMmemory(String filename, Schema schema) {
         this.schema = schema;
         level0 = new TreeMap<>();
+        level1 = new LSMdisk(filename, schema);
     }
 
     public LSMmemory(String filename) {
         this.level0 = new TreeMap<>();
+        level1 = new LSMdisk(filename);
     }
 
     @Override
     public void close() {
+        level1.close();
     }
 
     @Override
@@ -46,6 +50,11 @@ public class LSMmemory implements ITable {
         // 	prevent user from modifying tuple after it has
         //   been added into the tree and constraints (if any) have been checked.
         level0.put(t.getKey(), t); // up-sert update+insert
+
+        if (level0.size() > heapdb.Constants.LIMIT_0) {
+            level1.merge(level0);
+            level0.clear();
+        }
         return true;
 
     }
@@ -55,15 +64,20 @@ public class LSMmemory implements ITable {
         Tuple t = level0.remove(key);
         // if t == null, them key did not exist.
         // t contains the removed tuple
+        level0.put(key,  new TupleDeleted(schema, key));
         return true;
     }
 
     @Override
     public Tuple lookup(Object key) {
-        if (level0.get(key) != null) {
-            return level0.get(key);
+        Tuple t = level0.get(key);
+        if (t == null) {
+            return level1.lookup(key);
+        } else if (t instanceof TupleDeleted) {
+            return null;
+        } else {
+            return t;
         }
-        return null;
     }
 
     @Override
