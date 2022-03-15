@@ -1,0 +1,10 @@
+Week 03
+Programmer: Yuki Okamoto
+Partner: Matthew Fernandez
+How much time did your spend reviewing your partner's code:  20min
+
+The following is repeated for each item brought up at the review.
+
+Item Description: Nothing to say, it is really clean
+Classification:   suggestion
+Resolution:   NO because it works.
