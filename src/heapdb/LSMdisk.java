@@ -3,6 +3,7 @@ package heapdb;
 import static heapdb.Constants.BLOCK_SIZE;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -80,16 +81,33 @@ public class LSMdisk implements Iterable<Tuple> {
         Iterator<Entry<Object, Tuple>> it0 = level0.entrySet().iterator();
         Iterator<Tuple> it1 = this.iterator();
 
-        // TODO
-        /**
-         * to get the next Tuple from iterator it0, use the code it0.next().getValue()
-         * to get the next Tuple from iterator it1, use the code it1.next()
-         * remember to check hasNext() before calling next.
-         *
-         * to compare key,  use Tuple.compareKeys method.
-         *
-         * write tuples in key sequence to new file using LSMWriter.
-         */
+        Tuple headA, headB;
+        headA = (it0.hasNext()) ? it0.next().getValue() : null;
+        headB = (it1.hasNext()) ? it1.next() : null;
+
+        while (headA != null && headB != null) {
+            if (Tuple.compareKeys(headA.getKey(), headB.getKey()) <= 0) {
+                if (!(headA instanceof TupleDeleted)) {
+                    bw.append(headA);
+                }
+                headA = (it0.hasNext()) ? it0.next().getValue() : null;
+            } else {
+                bw.append(headB);
+                headB = (it1.hasNext()) ? it1.next() : null;
+            }
+        }
+
+        while (headA != null) {
+            if (!(headA instanceof TupleDeleted)) {
+                bw.append(headA);
+            }
+            headA = (it0.hasNext()) ? it0.next().getValue() : null;
+        }
+        while (headB != null) {
+            bw.append(headB);
+            headB = (it1.hasNext()) ? it1.next() : null;
+        }
+
         bw.flush();  // close temp file.
         tempFile.close();
 
