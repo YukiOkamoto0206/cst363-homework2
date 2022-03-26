@@ -3,7 +3,6 @@ package heapdb;
 import static heapdb.Constants.BLOCK_SIZE;
 
 import java.io.File;
-import java.lang.reflect.Type;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -15,6 +14,7 @@ public class LSMdisk implements Iterable<Tuple> {
     private Schema schema;
     private BlockedFile bfile;
     private String filename;
+    private LSMindex index;
 
     /**
      * Create new file and write schema to block 0.
@@ -27,6 +27,7 @@ public class LSMdisk implements Iterable<Tuple> {
         bfile = new BlockedFile(filename + ".lsm", true);
         schema.serialize(block0);
         bfile.writeBlock(0, block0);
+        index = new LSMindex(filename + ".ism", schema, true);  // create new empty index file
     }
 
     /**
@@ -37,6 +38,7 @@ public class LSMdisk implements Iterable<Tuple> {
         ByteBuffer block0 = ByteBuffer.wrap(new byte[heapdb.Constants.BLOCK_SIZE]);
         bfile.readBlock(0, block0);
         this.schema = Schema.deserialize(block0);
+        index = new LSMindex(filename + ".ism", schema, false);  // open existing index file
     }
 
     public Schema getSchema() {
@@ -49,6 +51,7 @@ public class LSMdisk implements Iterable<Tuple> {
 
     public void close() {
         bfile.close();
+        index.close();
 
     }
 
@@ -57,13 +60,27 @@ public class LSMdisk implements Iterable<Tuple> {
      */
 
     public Tuple lookup(Object key) {
-        for (Tuple tuple : this) {
-            if (tuple.getKey().equals(key)) {
-                return tuple;
+        /*
+         * use LSMiterator to read all tuples in file and search for key.
+         */
+        ByteBuffer byte_buffer = ByteBuffer.wrap(new byte[BLOCK_SIZE]);
+        int blockno = index.lookup(key);
+        if (blockno <= 0) {
+            return null;
+        } else {
+            byte_buffer = ByteBuffer.wrap(new byte[BLOCK_SIZE]);
+            bfile.readBlock(blockno, byte_buffer);
+            while (byte_buffer.position() < byte_buffer.limit()) {
+                Tuple head = Tuple.deserialize(schema, byte_buffer);
+//	            	if(byte_buffer.remaining() != 0) {
+                if (head.getKey().equals(key)) {
+                    return head;
+                }
             }
+            return null;
         }
-        return null;
     }
+
 
     /**
      * merge data in level0 memory TreeMap
@@ -81,7 +98,17 @@ public class LSMdisk implements Iterable<Tuple> {
         Iterator<Entry<Object, Tuple>> it0 = level0.entrySet().iterator();
         Iterator<Tuple> it1 = this.iterator();
 
-        Tuple headA, headB;
+        /**
+         * to get the next Tuple from iterator it0, use the code it0.next().getValue()
+         * to get the next Tuple from iterator it1, use the code it1.next()
+         * remember to check hasNext() before calling next.
+         *
+         * to compare key,  use Tuple.compareKeys method.
+         *
+         * write tuples in key sequence to new file using LSMWriter.
+         */
+
+        Tuple headA, headB; // merging two sorted lists -2 slide
         headA = (it0.hasNext()) ? it0.next().getValue() : null;
         headB = (it1.hasNext()) ? it1.next() : null;
 
@@ -124,7 +151,10 @@ public class LSMdisk implements Iterable<Tuple> {
 
         bfile = new BlockedFile(filename + ".lsm", false);  // open the disk file.
 
+        index.close();
+        index = new LSMindex(filename + ".ism", schema, true);      // create new index
         buildIndex();
+
 
         return true;
     }
@@ -133,7 +163,34 @@ public class LSMdisk implements Iterable<Tuple> {
      * build sparse index over LSMdisk blocks
      */
     void buildIndex() {
-        // TODO  this will be implemented in week 8.
+//    	 scan all tuples in the disk file and use the LSMindex insert(key, blockno)
+//    	 method to create index entries.  After all leaf node entries, call 
+//    	 createIndexTree to create non-leaf blocks up to an including root block.  
+//    	 Root block must be the last block in index file.
+        ByteBuffer b = ByteBuffer.wrap(new byte[heapdb.Constants.BLOCK_SIZE]);
+//        LSMindex index = new LSMindex(filename, schema, true);
+        LSMIterator it = iterator();
+        Tuple prevBuffer = new Tuple(schema);
+        int counter = 1;
+        for (Tuple t : this) {
+            if (counter == 1) {
+                Tuple currBuffer = t.deserialize(t.getSchema(), b);
+                index.insertEntry(currBuffer.getKey(), it.blockNo);
+                prevBuffer = currBuffer;
+                counter++;
+                continue;
+            } else {
+                Tuple currBuffer = t.deserialize(t.getSchema(), b);
+                if (currBuffer != prevBuffer) {
+                    index.insertEntry(currBuffer.getKey(), it.blockNo);
+                    prevBuffer = currBuffer;
+                } else {
+                    continue;
+                }
+
+            }
+        }
+        index.createIndexTree();
     }
 
     @Override
@@ -279,5 +336,6 @@ public class LSMdisk implements Iterable<Tuple> {
             System.out.printf(" Rec %d %s\n", recno, it.next());
             recno++;
         }
+        index.printDiagnostic();
     }
 }
